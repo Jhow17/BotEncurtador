@@ -1,4 +1,5 @@
 import os 
+import validators 
 import logging
 from dotenv import load_dotenv
 
@@ -24,8 +25,13 @@ async def start(update:Update, context:ContextTypes.DEFAULT_TYPE ):
 
 async def read_url(update:Update, context:ContextTypes.DEFAULT_TYPE):
     if context.user_data.get('iniciado'):
-        url = update.message.text
-        await context.bot.send_message(chat_id=update.effective_chat.id, text=url)
+        url_passada = update.message.text
+        
+        if validators.url(url_passada):
+            await context.bot.send_message(chat_id=update.effective_chat.id, text=url_passada)
+        else:
+            await context.bot.send_message(chat_id=update.effective_chat.id, text="Isso nao e uma URL")
+            
     else:
         await context.bot.send_message(
             chat_id=update.effective_chat.id, 
