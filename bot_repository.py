@@ -51,7 +51,7 @@ async def apagar_url(id_url):
         logging.error(f"Falha ao apagar URL (ID {id_url}): {e}")
         return False
 
-async def adicionar_url(url):
+async def cadastra_url(url):
     try:
         async with await psycopg.AsyncConnection.connect(string_conexao) as conn:
             async with conn.cursor() as cursor:
@@ -64,12 +64,28 @@ async def adicionar_url(url):
                  
                 await conn.commit()
                 
-                return resultado[0]
+                return resultado
                 
     except psycopg.Error as e:
         print(e)
         logging.error(f"Falha ao adicionar URL {url}")
         return None
         
-
-
+async def cadastra_url_encurtada(url_curta, hash, id_url_original):
+    try:
+        async with await psycopg.AsyncConnection.connect(string_conexao) as conn:
+           async with conn.cursor() as cursor:
+                await cursor.execute("INSERT INTO url_encurtada (url_curta, hash_code, id_url_original) VALUES (%s,%s,%s) RETURNING url_curta;"
+                                     ,(url_curta, hash, id_url_original))
+                url_encurtada = await cursor.fetchone()
+                
+                await conn.commit()
+                                
+                return url_encurtada
+                
+        
+        
+    except psycopg.Error as e:
+        print(f'Erro do banco de dados {e}')
+        logging.error(f"Falha ao adicionar URL encurtada")
+        return None

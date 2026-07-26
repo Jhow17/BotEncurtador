@@ -1,7 +1,7 @@
 import os 
 import validators 
 import logging
-import bot_repository
+import bot_services
 from dotenv import load_dotenv
 
 from telegram import Update
@@ -29,11 +29,11 @@ async def read_url(update:Update, context:ContextTypes.DEFAULT_TYPE):
         url_passada = update.message.text
         
         if validators.url(url_passada):
-            resultado = await bot_repository.adicionar_url(url_passada)
-            if resultado is not None:
-                await context.bot.send_message(chat_id=update.effective_chat.id, text=resultado)
+            url_encurtada = await bot_services.encurtar_url(url_passada)
+            if url_encurtada is not None:
+                await context.bot.send_message(chat_id=update.effective_chat.id, text=url_encurtada)
             else:
-                await context.bot.send_message(chat_id=update.effective_chat.id, text="Erro ao adicionar url")
+                await context.bot.send_message(chat_id=update.effective_chat.id, text="Erro ao encurtar url")
             
         else:
             await context.bot.send_message(chat_id=update.effective_chat.id, text="Isso nao e uma URL")
